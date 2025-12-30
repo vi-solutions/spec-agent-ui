@@ -57,3 +57,23 @@ export async function uploadSpec(params: { projectId: string; file: File }) {
   if (!res.ok) throw new Error(`Failed to upload spec: ${res.status}`);
   return res.json();
 }
+
+export async function listBaselineSpecs(): Promise<SpecFile[]> {
+  const res = await fetch(`${API_BASE}/specs?baseline=true`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to list baseline specs: ${res.status}`);
+  return res.json();
+}
+
+export async function uploadBaselineSpec(file: File) {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_BASE}/specs/upload`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) throw new Error(`Failed to upload baseline spec: ${res.status}`);
+  return res.json();
+}

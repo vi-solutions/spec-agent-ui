@@ -1,50 +1,49 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { SpecFile } from "@lib/api";
-import { listSpecs, uploadSpec } from "@lib/api";
-import { Card } from "@components/ui/Card";
-import { Button } from "@components/ui/Button";
+import type { SpecFile } from "@/lib/api";
+import { listBaselineSpecs, uploadBaselineSpec } from "@/lib/api";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 type Status = "idle" | "loading" | "error";
 
 function StatusBadge(props: { status: SpecFile["ingestionStatus"] }) {
-  const { status } = props;
-
   const base =
     "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium";
 
-  switch (status) {
+  switch (props.status) {
     case "indexed":
       return (
-        <span className={`${base} border-emerald-300 text-emerald-500`}>
+        <span
+          className={`${base} border-emerald-200 bg-emerald-50 text-emerald-700`}
+        >
           INDEXED
         </span>
       );
     case "failed":
       return (
-        <span className={`${base} border-red-200 text-red-700`}>FAILED</span>
+        <span className={`${base} border-red-200 bg-red-50 text-red-700`}>
+          FAILED
+        </span>
       );
     case "pending":
     default:
       return (
-        <span className={`${base} border-slate-200 text-slate-400`}>
+        <span className={`${base} border-slate-200 bg-slate-50 text-slate-700`}>
           PENDING
         </span>
       );
   }
 }
 
-export default function ProjectSpecsView(props: { projectId: string }) {
-  const { projectId } = props;
-
+export default function BaselineSpecsView() {
   const [specs, setSpecs] = useState<SpecFile[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
-  const canUpload = useMemo(() => file != null, [file]);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +53,7 @@ export default function ProjectSpecsView(props: { projectId: string }) {
       setError(null);
 
       try {
-        const data = await listSpecs(projectId);
+        const data = await listBaselineSpecs();
         if (!cancelled) {
           setSpecs(data);
           setStatus("idle");
@@ -72,14 +71,14 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [projectId]);
+  }, []);
 
   async function refresh() {
     setStatus("loading");
     setError(null);
 
     try {
-      const data = await listSpecs(projectId);
+      const data = await listBaselineSpecs();
       setSpecs(data);
       setStatus("idle");
     } catch (e) {
@@ -98,15 +97,13 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     setError(null);
 
     try {
-      const created = (await uploadSpec({ projectId, file })) as SpecFile;
+      const created = (await uploadBaselineSpec(file)) as SpecFile;
 
-      // optimistic insert (you can swap this for `await refresh()` if you prefer canonical)
       setSpecs((prev) => [created, ...prev]);
-
-      // clear local file state + input
       setFile(null);
+
       const input = document.getElementById(
-        "specFile"
+        "baselineFile"
       ) as HTMLInputElement | null;
       if (input) {
         input.value = "";
@@ -119,70 +116,65 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     }
   }
 
+  const canUpload = file != null;
+
   return (
     <section className="space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Project</h2>
-          <div className="text-xs text-slate-400">ID: {projectId}</div>
+          <h2 className="text-xl font-semibold">Baseline specs</h2>
+          <p className="text-sm ">
+            Baseline specs are global and can be reused across projects.
+          </p>
         </div>
 
         <Link href="/" className="text-sm">
           ← Back
         </Link>
       </div>
+
+      <Card className="space-y-4">
+        <div className="font-semibold">Upload baseline spec</div>
+
+        <form onSubmit={onUpload} className="space-y-3">
+          <input
+            id="baselineFile"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
+          />
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!canUpload || status === "loading"}
+            >
+              {status === "loading" ? "Uploading..." : "Upload"}
+            </Button>
+            {error && <span className="text-sm text-red-600">{error}</span>}
+          </div>
+        </form>
+      </Card>
+
       <Card>
-        {/* Upload */}
-        <Card>
-          <form onSubmit={onUpload}>
-            <div className="font-semibold">Upload spec</div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">File</label>
-              <input
-                id="specFile"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
-              />
-              <div className="text-xs text-slate-400">
-                Accepted: PDF, DOC, DOCX
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mt-2">
-              <Button
-                type="submit"
-                disabled={!canUpload || status === "loading"}
-                variant="primary"
-              >
-                {status === "loading" ? "Uploading..." : "Upload"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-
-        {/* Specs list */}
-        <div className="flex items-baseline justify-between">
-          <div className="flex gap-2 mt-6">
-            <div className="font-semibold">Specs</div>
-            <div className="text-slate-400">({specs.length})</div>
+        <div className="flex justify-between">
+          <div className="flex gap-3 items-center">
+            <div className="font-semibold">Baseline library</div>
+            <div className="text-sm ">({specs.length})</div>
           </div>
           <Button
+            type="button"
             onClick={() => void refresh()}
             disabled={status === "loading"}
-            variant="secondary"
             size="sm"
           >
             Refresh
           </Button>
-
-          {error && <span className="text-sm text-red-600">{error}</span>}
         </div>
 
-        <div className="mt-2 space-y-2">
+        <div className="mt-4 space-y-2">
           {specs.map((s) => (
             <div
               key={s.id}
@@ -191,7 +183,7 @@ export default function ProjectSpecsView(props: { projectId: string }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{s.originalName}</div>
-                  <div className="mt-0.5 text-xs text-slate-400">
+                  <div className="text-xs ">
                     Created: {new Date(s.createdAt).toLocaleString()}
                   </div>
                 </div>
@@ -206,7 +198,7 @@ export default function ProjectSpecsView(props: { projectId: string }) {
           ))}
 
           {specs.length === 0 && status !== "loading" ? (
-            <div className="text-sm text-slate-400">No specs uploaded yet.</div>
+            <div className="text-sm ">No baseline specs yet.</div>
           ) : null}
         </div>
       </Card>

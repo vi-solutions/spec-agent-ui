@@ -27,8 +27,8 @@ export function Button({
   const variants: Record<Variant, string> = {
     primary: "bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-500",
     secondary:
-      "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 focus:ring-slate-400",
-    ghost: "text-slate-700 hover:bg-slate-100 focus:ring-slate-400",
+      "text-slate-600 border border-slate-300 hover:bg-slate-300 focus:ring-slate-400 bg-slate-200",
+    ghost: "text-slate-700 hover:bg-slate-200 focus:ring-slate-400",
     danger: "bg-red-600 text-white hover:bg-red-500 focus:ring-red-500",
   };
 

@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ccccccff;
+  --foreground: #5d5d5dff;
+  --header: #252525ff;
+  --link: #3328d1ff;
+  --link-hover: #4e48ffff;
+  --card-bg: #ffffffff;
+  --input-bg: #f0f0f0ff;
 }
 
 @theme inline {
@@ -12,13 +17,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0f16dc;
-    --foreground: #1c1b1bff;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -26,5 +24,54 @@ body {
   height: 100vh;
 }
 
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--header);
+}
+
+a {
+  color: var(--link);
+  font-weight: 500;
+}
+
+.bg-input {
+  background-color: var(--input-bg);
+}
+
+.card-bg {
+  background-color: var(--card-bg);
+}
+
+a:hover {
+  color: var(--link-hover);
+  filter: brightness(0.9);
+}
+
+input {
+  background-color: var(--input-bg);
+}
+
+input[type="file"] {
+  cursor: pointer;
+}
+
 main {
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0f16dc;
+    --foreground: #e0e0e8ff;
+    --header: #7086fa;
+    --link: #c2c0dfff;
+    --link-hover: #e4e3f3ff;
+    --card-bg: #44484cff;
+    --input-bg: #353841ff;
+  }
+  a:hover {
+    filter: brightness(1.2);
+  }
 }

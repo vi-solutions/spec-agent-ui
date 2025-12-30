@@ -87,10 +87,21 @@ export default function ProjectsView() {
 
   return (
     <section className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-slate-400">Spec Agent</h2>
+        </div>
+        <Link
+          href="/baselines"
+          className="text-sm text-blue-600 hover:text-blue-700"
+        >
+          Baselines →
+        </Link>
+      </div>
       {/* Create project */}
       <form onSubmit={onCreate}>
         <Card>
-          <div className="font-semibold">Create project</div>
+          <h4 className="font-semibold">Create project</h4>
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Name</label>
@@ -120,16 +131,6 @@ export default function ProjectsView() {
             >
               {status === "loading" ? "Creating..." : "Create"}
             </Button>
-
-            <Button
-              onClick={() => void refresh()}
-              disabled={status === "loading"}
-              variant="secondary"
-            >
-              Refresh
-            </Button>
-
-            {error && <span className="text-sm text-red-600">{error}</span>}
           </div>
         </Card>
       </form>
@@ -137,8 +138,20 @@ export default function ProjectsView() {
       {/* Projects list */}
       <Card>
         <div className="flex items-center justify-between">
-          <div className="font-semibold">Projects</div>
-          <div className="text-sm text-slate-400">{projects.length}</div>
+          <div className="flex gap-2 items-baseline">
+            <div className="font-semibold">Projects</div>
+            <div className="text-slate-400">({projects.length})</div>
+          </div>
+          <Button
+            onClick={() => void refresh()}
+            disabled={status === "loading"}
+            variant="secondary"
+            size="sm"
+          >
+            Refresh
+          </Button>
+
+          {error && <span className="text-sm text-red-600">{error}</span>}
         </div>
 
         <div className="mt-4 space-y-2">
@@ -146,7 +159,7 @@ export default function ProjectsView() {
             <Link
               key={p.id}
               href={`/projects/${encodeURIComponent(p.id)}`}
-              className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 hover:bg-slate-100"
+              className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 bg-input hover:bg-slate-700"
             >
               <div className="flex flex-col">
                 <span className="font-medium">{p.name}</span>
