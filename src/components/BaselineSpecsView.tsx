@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { SpecFile } from "@/lib/api";
-import { listBaselineSpecs, uploadBaselineSpec } from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { useApi } from "@/hooks/use-api";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Status = "idle" | "loading" | "error";
 
@@ -44,16 +45,22 @@ export default function BaselineSpecsView() {
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
+  const api = useApi();
+  const { isAuthenticated, isLoading } = useAuth0();
 
   useEffect(() => {
     let cancelled = false;
+
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
 
     async function load() {
       setStatus("loading");
       setError(null);
 
       try {
-        const data = await listBaselineSpecs();
+        const data = await api.listBaselineSpecs();
         if (!cancelled) {
           setSpecs(data);
           setStatus("idle");
@@ -71,14 +78,14 @@ export default function BaselineSpecsView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [api, isAuthenticated, isLoading]);
 
   async function refresh() {
     setStatus("loading");
     setError(null);
 
     try {
-      const data = await listBaselineSpecs();
+      const data = await api.listBaselineSpecs();
       setSpecs(data);
       setStatus("idle");
     } catch (e) {
@@ -97,7 +104,7 @@ export default function BaselineSpecsView() {
     setError(null);
 
     try {
-      const created = (await uploadBaselineSpec(file)) as SpecFile;
+      const created = (await api.uploadBaselineSpec(file)) as SpecFile;
 
       setSpecs((prev) => [created, ...prev]);
       setFile(null);

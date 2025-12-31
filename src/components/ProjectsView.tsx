@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Project } from "@/lib/api";
-import { createProject, listProjects } from "@/lib/api";
 import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
+import { useApi } from "@/hooks/use-api";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Status = "idle" | "loading" | "error";
 
@@ -18,16 +19,22 @@ export default function ProjectsView() {
   const [code, setCode] = useState("");
 
   const canCreate = name.trim().length > 0;
+  const api = useApi();
+  const { isAuthenticated, isLoading } = useAuth0();
 
   useEffect(() => {
     let cancelled = false;
+
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
 
     async function load() {
       setStatus("loading");
       setError(null);
 
       try {
-        const data = await listProjects();
+        const data = await api.listProjects();
         if (!cancelled) {
           setProjects(data);
           setStatus("idle");
@@ -44,14 +51,14 @@ export default function ProjectsView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [api, isAuthenticated, isLoading]);
 
   async function refresh() {
     setStatus("loading");
     setError(null);
 
     try {
-      const data = await listProjects();
+      const data = await api.listProjects();
       setProjects(data);
       setStatus("idle");
     } catch (e) {
@@ -70,7 +77,7 @@ export default function ProjectsView() {
     setError(null);
 
     try {
-      const created = await createProject({
+      const created = await api.createProject({
         name: name.trim(),
         code: code.trim() || undefined,
       });
@@ -88,9 +95,6 @@ export default function ProjectsView() {
   return (
     <section className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-slate-400">Spec Agent</h2>
-        </div>
         <Link
           href="/baselines"
           className="text-sm text-blue-600 hover:text-blue-700"

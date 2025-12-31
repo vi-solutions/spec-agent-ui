@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { SpecFile } from "@lib/api";
-import { listSpecs, uploadSpec } from "@lib/api";
 import { Card } from "@components/ui/Card";
 import { Button } from "@components/ui/Button";
+import { useApi } from "@/hooks/use-api";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Status = "idle" | "loading" | "error";
 
@@ -45,16 +46,22 @@ export default function ProjectSpecsView(props: { projectId: string }) {
 
   const [file, setFile] = useState<File | null>(null);
   const canUpload = useMemo(() => file != null, [file]);
+  const api = useApi();
+  const { isAuthenticated, isLoading } = useAuth0();
 
   useEffect(() => {
     let cancelled = false;
+
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
 
     async function load() {
       setStatus("loading");
       setError(null);
 
       try {
-        const data = await listSpecs(projectId);
+        const data = await api.listSpecs(projectId);
         if (!cancelled) {
           setSpecs(data);
           setStatus("idle");
@@ -72,14 +79,14 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [projectId]);
+  }, [projectId, api, isAuthenticated, isLoading]);
 
   async function refresh() {
     setStatus("loading");
     setError(null);
 
     try {
-      const data = await listSpecs(projectId);
+      const data = await api.listSpecs(projectId);
       setSpecs(data);
       setStatus("idle");
     } catch (e) {
@@ -98,7 +105,7 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     setError(null);
 
     try {
-      const created = (await uploadSpec({ projectId, file })) as SpecFile;
+      const created = (await api.uploadSpec({ projectId, file })) as SpecFile;
 
       // optimistic insert (you can swap this for `await refresh()` if you prefer canonical)
       setSpecs((prev) => [created, ...prev]);
@@ -191,6 +198,9 @@ export default function ProjectSpecsView(props: { projectId: string }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{s.originalName}</div>
+                  <div className="truncate font-medium">
+                    Revision: {s.revision}
+                  </div>
                   <div className="mt-0.5 text-xs text-slate-400">
                     Created: {new Date(s.createdAt).toLocaleString()}
                   </div>
