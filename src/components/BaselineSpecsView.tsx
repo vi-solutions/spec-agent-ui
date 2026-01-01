@@ -135,7 +135,7 @@ export default function BaselineSpecsView() {
           </p>
         </div>
 
-        <Link href="/" className="text-sm">
+        <Link href="/" className="text-sm no-print">
           ← Back
         </Link>
       </div>

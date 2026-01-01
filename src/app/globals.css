@@ -75,3 +75,67 @@ main {
     filter: brightness(1.2);
   }
 }
+
+/* Explicit theme override (set on <html> via data-theme). */
+:root[data-theme="light"] {
+  --background: #ccccccff;
+  --foreground: #5d5d5dff;
+  --header: #252525ff;
+  --link: #3328d1ff;
+  --link-hover: #4e48ffff;
+  --card-bg: #ffffffff;
+  --input-bg: #f0f0f0ff;
+}
+
+:root[data-theme="dark"] {
+  --background: #0b0f16dc;
+  --foreground: #e0e0e8ff;
+  --header: #7086fa;
+  --link: #c2c0dfff;
+  --link-hover: #e4e3f3ff;
+  --card-bg: #44484cff;
+  --input-bg: #353841ff;
+}
+
+:root[data-theme="dark"] a:hover {
+  filter: brightness(1.2);
+}
+
+@media print {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+    --header: #000000;
+    --link: #000000;
+    --link-hover: #000000;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+  }
+
+  html,
+  body {
+    height: auto;
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+
+  a {
+    color: var(--link) !important;
+    text-decoration: underline;
+  }
+
+  [data-app-header],
+  .no-print {
+    display: none !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+}
