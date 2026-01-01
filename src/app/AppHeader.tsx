@@ -15,7 +15,7 @@ export function AppHeader() {
     <header className="border-b border-slate-200 bg-slate-600">
       <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-6 py-3">
         <Link href="/" className="font-semibold">
-          <h1>Spec Agent</h1>
+          <h1 className="text-xl font-bold">Spec Agent</h1>
         </Link>
 
         <div className="flex items-center gap-3">

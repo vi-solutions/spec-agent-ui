@@ -27,8 +27,8 @@
 - Providers: `src/app/layout.tsx` wraps the app in `src/app/providers.tsx` (`<Auth0Provider ... />`).
 - API client: components call `useApi()` (`src/hooks/use-api.ts`) which creates an authenticated client via `createApi(getToken)` in `src/lib/api.ts`.
 - Routes / views:
-  - `/` → `src/app/page.tsx` → `src/components/ProjectsView.tsx` (list + create projects)
-  - `/projects/[projectId]` → `src/app/projects/[projectId]/page.tsx` → `src/components/ProjectSpecsView.tsx` (list + upload project specs)
+  - `/` → `src/app/page.tsx` → `src/components/MainView.tsx` (list + create projects)
+  - `/projects/[projectId]` → `src/app/projects/[projectId]/page.tsx` → `src/components/ProjectView.tsx` (list + upload project specs)
   - `/baselines` → `src/app/baselines/page.tsx` → `src/components/BaselineSpecsView.tsx` (list + upload baseline specs)
   - `/auth-test` → `src/app/auth-test/page.tsx` (manual Auth0/token debugging; handles “consent_required”)
 
@@ -49,7 +49,7 @@
 ## Code conventions to follow
 
 - Client-side data loading is done in **client components** (`"use client"`) with `useEffect` + a `cancelled` flag, plus local `status: "idle" | "loading" | "error"` and `error: string | null`.
-  - Examples: `src/components/ProjectsView.tsx`, `src/components/ProjectSpecsView.tsx`.
+  - Examples: `src/components/MainView.tsx`, `src/components/ProjectView.tsx`.
 - Prefer adding new backend calls to `createApi()` in `src/lib/api.ts` and consuming them via `useApi()` (typed exports like `Project`, `SpecFile`).
 - Error handling pattern: API helpers use `parseJsonOrThrow()` which reads the response body text on non-2xx to aid debugging.
 - Path aliases: use `@/…` for `src/*` and `@components/…` for `src/components/*` (see `tsconfig.json`).

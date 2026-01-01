@@ -1,4 +1,4 @@
-import ProjectSpecsView from "@/components/ProjectSpecsView";
+import ProjectView from "@components/ProjectView";
 
 export default async function ProjectPage(props: {
   params: Promise<{ projectId: string }>;
@@ -7,7 +7,7 @@ export default async function ProjectPage(props: {
 
   return (
     <main className="mx-auto max-w-4xl p-6">
-      <ProjectSpecsView projectId={projectId} />
+      <ProjectView projectId={projectId} />
     </main>
   );
 }

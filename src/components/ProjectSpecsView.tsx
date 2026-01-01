@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import type { SpecFile } from "@lib/api";
 import { Card } from "@components/ui/Card";
 import { Button } from "@components/ui/Button";
@@ -46,6 +45,7 @@ export default function ProjectSpecsView(props: { projectId: string }) {
 
   const [file, setFile] = useState<File | null>(null);
   const canUpload = useMemo(() => file != null, [file]);
+
   const api = useApi();
   const { isAuthenticated, isLoading } = useAuth0();
 
@@ -107,10 +107,8 @@ export default function ProjectSpecsView(props: { projectId: string }) {
     try {
       const created = (await api.uploadSpec({ projectId, file })) as SpecFile;
 
-      // optimistic insert (you can swap this for `await refresh()` if you prefer canonical)
       setSpecs((prev) => [created, ...prev]);
 
-      // clear local file state + input
       setFile(null);
       const input = document.getElementById(
         "specFile"
@@ -127,99 +125,84 @@ export default function ProjectSpecsView(props: { projectId: string }) {
   }
 
   return (
-    <section className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Project</h2>
-          <div className="text-xs text-slate-400">ID: {projectId}</div>
-        </div>
-
-        <Link href="/" className="text-sm">
-          ← Back
-        </Link>
-      </div>
+    <Card>
       <Card>
-        {/* Upload */}
-        <Card>
-          <form onSubmit={onUpload}>
-            <div className="font-semibold">Upload spec</div>
+        <form onSubmit={onUpload}>
+          <div className="font-semibold">Upload spec</div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">File</label>
-              <input
-                id="specFile"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
-              />
-              <div className="text-xs text-slate-400">
-                Accepted: PDF, DOC, DOCX
-              </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">File</label>
+            <input
+              id="specFile"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
+            />
+            <div className="text-xs text-slate-400">
+              Accepted: PDF, DOC, DOCX
             </div>
-
-            <div className="flex items-center gap-3 mt-2">
-              <Button
-                type="submit"
-                disabled={!canUpload || status === "loading"}
-                variant="primary"
-              >
-                {status === "loading" ? "Uploading..." : "Upload"}
-              </Button>
-            </div>
-          </form>
-        </Card>
-
-        {/* Specs list */}
-        <div className="flex items-baseline justify-between">
-          <div className="flex gap-2 mt-6">
-            <div className="font-semibold">Specs</div>
-            <div className="text-slate-400">({specs.length})</div>
           </div>
-          <Button
-            onClick={() => void refresh()}
-            disabled={status === "loading"}
-            variant="secondary"
-            size="sm"
-          >
-            Refresh
-          </Button>
 
-          {error && <span className="text-sm text-red-600">{error}</span>}
-        </div>
-
-        <div className="mt-2 space-y-2">
-          {specs.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-lg border border-slate-100 p-3 space-y-2 bg-input"
+          <div className="flex items-center gap-3 mt-2">
+            <Button
+              type="submit"
+              disabled={!canUpload || status === "loading"}
+              variant="primary"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate font-medium">{s.originalName}</div>
-                  <div className="truncate font-medium">
-                    Revision: {s.revision}
-                  </div>
-                  <div className="mt-0.5 text-xs text-slate-400">
-                    Created: {new Date(s.createdAt).toLocaleString()}
-                  </div>
-                </div>
+              {status === "loading" ? "Uploading..." : "Upload"}
+            </Button>
+          </div>
+        </form>
+      </Card>
 
-                <StatusBadge status={s.ingestionStatus} />
+      <div className="flex items-baseline justify-between">
+        <div className="flex gap-2 mt-6">
+          <div className="font-semibold">Specs</div>
+          <div className="text-slate-400">({specs.length})</div>
+        </div>
+        <Button
+          onClick={() => void refresh()}
+          disabled={status === "loading"}
+          variant="secondary"
+          size="sm"
+        >
+          Refresh
+        </Button>
+
+        {error && <span className="text-sm text-red-600">{error}</span>}
+      </div>
+
+      <div className="mt-2 space-y-2">
+        {specs.map((s) => (
+          <div
+            key={s.id}
+            className="rounded-lg border border-slate-100 p-3 space-y-2 bg-input"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate font-medium">{s.originalName}</div>
+                <div className="truncate font-medium">
+                  Revision: {s.revision}
+                </div>
+                <div className="mt-0.5 text-xs text-slate-400">
+                  Created: {new Date(s.createdAt).toLocaleString()}
+                </div>
               </div>
 
-              {s.ingestionError ? (
-                <div className="text-sm text-red-600">{s.ingestionError}</div>
-              ) : null}
+              <StatusBadge status={s.ingestionStatus} />
             </div>
-          ))}
 
-          {specs.length === 0 && status !== "loading" ? (
-            <div className="text-sm text-slate-400">No specs uploaded yet.</div>
-          ) : null}
-        </div>
-      </Card>
-    </section>
+            {s.ingestionError ? (
+              <div className="text-sm text-red-600">{s.ingestionError}</div>
+            ) : null}
+          </div>
+        ))}
+
+        {specs.length === 0 && status !== "loading" ? (
+          <div className="text-sm text-slate-400">No specs uploaded yet.</div>
+        ) : null}
+      </div>
+    </Card>
   );
 }
