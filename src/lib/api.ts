@@ -232,6 +232,16 @@ export function createApi(getToken: GetToken) {
       return parseJsonOrThrow(res, "Failed to list comparisons");
     },
 
+    async runComparison(projectId: string): Promise<SpecComparisonRow> {
+      const res = await authedFetch(
+        `${API_BASE}/comparisons/project/${encodeURIComponent(projectId)}`,
+        {
+          method: "POST",
+        }
+      );
+      return parseJsonOrThrow(res, "Failed to run comparison");
+    },
+
     async getComparison(comparisonId: string): Promise<SpecComparisonRow> {
       const res = await authedFetch(`${API_BASE}/comparisons/${comparisonId}`, {
         cache: "no-store",

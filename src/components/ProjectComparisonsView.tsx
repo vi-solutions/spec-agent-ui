@@ -66,25 +66,51 @@ export default function ProjectComparisonsView(props: { projectId: string }) {
     }
   }
 
+  async function runComparison() {
+    setStatus("loading");
+    setError(null);
+
+    try {
+      await api.runComparison(projectId);
+      const data = await api.listComparisons(projectId);
+      setComparisons(data);
+      setStatus("idle");
+    } catch (e) {
+      setStatus("error");
+      setError(e instanceof Error ? e.message : "Unknown error");
+    }
+  }
+
   return (
     <Card>
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-baseline justify-between gap-3">
         <div className="flex gap-2">
           <div className="font-semibold">Comparisons</div>
           <div className="text-slate-400">({comparisons.length})</div>
         </div>
 
-        <Button
-          onClick={() => void refresh()}
-          disabled={status === "loading"}
-          variant="secondary"
-          size="sm"
-        >
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => void runComparison()}
+            disabled={status === "loading"}
+            variant="primary"
+            size="sm"
+          >
+            Run comparison
+          </Button>
 
-        {error && <span className="text-sm text-red-600">{error}</span>}
+          <Button
+            onClick={() => void refresh()}
+            disabled={status === "loading"}
+            variant="secondary"
+            size="sm"
+          >
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
 
       <div className="mt-4 space-y-2">
         {comparisons.map((c) => (
