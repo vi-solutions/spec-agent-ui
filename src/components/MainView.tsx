@@ -144,7 +144,7 @@ export default function ProjectsView() {
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-baseline">
             <div className="font-semibold">Projects</div>
-            <div className="text-slate-400">({projects.length})</div>
+            <div className="text-slate-500">({projects.length})</div>
           </div>
           <Button
             onClick={() => void refresh()}
@@ -167,17 +167,17 @@ export default function ProjectsView() {
             >
               <div className="flex flex-col">
                 <span className="font-medium">{p.name}</span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   {p.code ? `Code: ${p.code}` : "No code"}
                 </span>
               </div>
 
-              <span className="text-slate-400">→</span>
+              <span className="text-slate-500">→</span>
             </Link>
           ))}
 
           {projects.length === 0 && status !== "loading" && (
-            <div className="text-sm text-slate-400">No projects yet.</div>
+            <div className="text-sm text-slate-500">No projects yet.</div>
           )}
         </div>
       </Card>

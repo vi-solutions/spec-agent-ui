@@ -29,7 +29,7 @@ function StatusBadge(props: { status: SpecFile["ingestionStatus"] }) {
     case "pending":
     default:
       return (
-        <span className={`${base} border-slate-200 text-slate-400`}>
+        <span className={`${base} border-slate-200 text-slate-500`}>
           PENDING
         </span>
       );
@@ -139,7 +139,7 @@ export default function ProjectSpecsSection(props: { projectId: string }) {
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
             />
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-slate-500">
               Accepted: PDF, DOC, DOCX
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function ProjectSpecsSection(props: { projectId: string }) {
       <div className="flex items-baseline justify-between">
         <div className="flex gap-2 mt-6">
           <div className="font-semibold">Specs</div>
-          <div className="text-slate-400">({specs.length})</div>
+          <div className="text-slate-500">({specs.length})</div>
         </div>
         <Button
           onClick={() => void refresh()}
@@ -185,7 +185,7 @@ export default function ProjectSpecsSection(props: { projectId: string }) {
                 <div className="truncate font-medium">
                   Revision: {s.revision}
                 </div>
-                <div className="mt-0.5 text-xs text-slate-400">
+                <div className="mt-0.5 text-xs text-slate-500">
                   Created: {new Date(s.createdAt).toLocaleString()}
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function ProjectSpecsSection(props: { projectId: string }) {
         ))}
 
         {specs.length === 0 && status !== "loading" ? (
-          <div className="text-sm text-slate-400">No specs uploaded yet.</div>
+          <div className="text-sm text-slate-500">No specs uploaded yet.</div>
         ) : null}
       </div>
     </Card>

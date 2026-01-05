@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Card } from "@components/ui/Card";
+import { Button } from "@components/ui/Button";
 import { useApi } from "@/hooks/use-api";
 import {
   type CitationV1,
@@ -11,6 +12,7 @@ import {
   type VarianceItemV1,
   type VarianceReportV1,
 } from "@/lib/api";
+import { humanizeIdentifier } from "@/lib/humanize";
 
 type Status = "idle" | "loading" | "error";
 
@@ -32,9 +34,9 @@ function severityBadgeTextClass(severity: VarianceItemV1["severity"]) {
     case "low":
       return "text-slate-500";
     case "info":
-      return "text-slate-400";
+      return "text-slate-500";
     default:
-      return "text-slate-400";
+      return "text-slate-500";
   }
 }
 
@@ -46,13 +48,13 @@ function StatementBlock(props: {
 
   return (
     <div className="space-y-1">
-      <div className="text-sm text-slate-400">{label}</div>
+      <div className="text-sm text-slate-500">{label}</div>
       {statement ? (
         <div className="space-y-1">
           <div className="text-sm">{statement.statement}</div>
         </div>
       ) : (
-        <div className="text-sm text-slate-400">—</div>
+        <div className="text-sm text-slate-500">—</div>
       )}
     </div>
   );
@@ -75,7 +77,7 @@ function CitationList(props: { label: string; citations: CitationV1[] }) {
             <div className="text-sm font-medium">
               {c.sourceTitle}
               {c.locator ? (
-                <span className="text-slate-400"> • {c.locator}</span>
+                <span className="text-slate-500"> • {c.locator}</span>
               ) : null}
             </div>
             <div className="text-sm text-amber-600 whitespace-pre-wrap">
@@ -95,7 +97,7 @@ function SectionTitle(props: { children: string }) {
 function StatTile(props: { label: string; value: number }) {
   return (
     <div className="rounded-lg border border-slate-100 bg-input px-3 py-2">
-      <div className="text-sm text-slate-400">{props.label}</div>
+      <div className="text-sm text-slate-500">{props.label}</div>
       <div className="text-lg font-semibold">{props.value}</div>
     </div>
   );
@@ -105,7 +107,7 @@ function KeyFindingsList(props: { findings: string | null | undefined }) {
   const { findings } = props;
 
   if (!findings) {
-    return <div className="text-sm text-slate-400">No key findings.</div>;
+    return <div className="text-sm text-slate-500">No key findings.</div>;
   }
 
   return <div className="text-sm whitespace-pre-wrap">{findings}</div>;
@@ -120,7 +122,7 @@ function mapRiskToTextClass(risk: string) {
     case "high":
       return "text-red-600";
     default:
-      return "text-slate-400";
+      return "text-slate-500";
   }
 }
 
@@ -177,24 +179,24 @@ function InputsSection(props: { report: VarianceReportV1 }) {
       <SectionTitle>Inputs</SectionTitle>
       <div className="grid gap-2 md:grid-cols-3">
         <div className="rounded-lg border border-slate-100 bg-input px-3 py-2">
-          <div className="text-sm text-slate-400">Client spec</div>
+          <div className="text-sm text-slate-500">Client spec</div>
           <div className="text-sm font-medium">{inputs.clientSpec.title}</div>
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-500">
             {inputs.clientSpec.specFileId}
           </div>
         </div>
         <div className="rounded-lg border border-slate-100 bg-input px-3 py-2">
-          <div className="text-sm text-slate-400">Baseline spec</div>
+          <div className="text-sm text-slate-500">Baseline spec</div>
           <div className="text-sm font-medium">{inputs.baselineSpec.title}</div>
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-500">
             {inputs.baselineSpec.specFileId}
           </div>
         </div>
         <div className="rounded-lg border border-slate-100 bg-input px-3 py-2">
-          <div className="text-sm text-slate-400">Model</div>
+          <div className="text-sm text-slate-500">Model</div>
           <div className="text-sm font-medium">{inputs.model.name}</div>
           {inputs.model.temperature != null ? (
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-slate-500">
               Temperature: {inputs.model.temperature}
             </div>
           ) : null}
@@ -209,7 +211,7 @@ function DeltaSection(props: { delta: VarianceItemV1["delta"] }) {
 
   return (
     <div className="space-y-1">
-      <div className="text-sm text-slate-400">Delta</div>
+      <div className="text-sm text-slate-500">Delta</div>
       <div className="text-sm whitespace-pre-wrap">{delta.description}</div>
       {delta.recommendedAction ? (
         <div className="text-sm text-amber-600 whitespace-pre-wrap">
@@ -251,9 +253,11 @@ function VarianceItemCard(props: { item: VarianceItemV1 }) {
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-medium truncate">{item.topic}</div>
-          <div className="text-sm text-slate-400">
-            {item.category} • {item.status} • severity: {item.severity}
-            {item.decisionNeeded ? " • decision needed" : ""}
+          <div className="text-sm text-slate-500">
+            {humanizeIdentifier(item.category)} •{" "}
+            {humanizeIdentifier(item.status)} • Severity:{" "}
+            {humanizeIdentifier(item.severity)}
+            {item.decisionNeeded ? " • Decision Needed" : ""}
           </div>
         </div>
 
@@ -265,9 +269,9 @@ function VarianceItemCard(props: { item: VarianceItemV1 }) {
               severityBadgeTextClass(item.severity)
             }
           >
-            {item.severity}
+            {humanizeIdentifier(item.severity)}
           </span>
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-500">
             Decision needed: <span>{formatBool(item.decisionNeeded)}</span>
           </div>
         </div>
@@ -317,7 +321,7 @@ function ItemsSection(props: { items: VarianceReportV1["items"] }) {
     <div className="space-y-3">
       <div className="flex items-baseline justify-between gap-3">
         <SectionTitle>Items</SectionTitle>
-        <div className="text-sm text-slate-400">{items.length} total</div>
+        <div className="text-sm text-slate-500">{items.length} total</div>
       </div>
 
       <div className="space-y-3">
@@ -391,22 +395,33 @@ export default function VarianceReportView(props: {
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold">Comparison report</h2>
-          <div className="text-sm text-slate-400">ID: {comparisonId}</div>
+          <div className="text-sm text-slate-500">ID: {comparisonId}</div>
         </div>
 
-        <Link
-          href={`/projects/${encodeURIComponent(projectId)}`}
-          className="text-sm no-print"
-        >
-          ← Back
-        </Link>
+        <div className="flex items-center gap-2 no-print">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={status === "loading" || !report}
+            onClick={() => window.print()}
+          >
+            Save as PDF
+          </Button>
+          <Link
+            href={`/projects/${encodeURIComponent(projectId)}`}
+            className="text-sm"
+          >
+            ← Back
+          </Link>
+        </div>
       </div>
 
       {error ? <div className="text-sm text-red-600">{error}</div> : null}
 
       <Card className="border-0">
         {status === "loading" ? (
-          <div className="text-sm text-slate-400">Loading…</div>
+          <div className="text-sm text-slate-500">Loading…</div>
         ) : report ? (
           <div className="space-y-4">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -414,7 +429,7 @@ export default function VarianceReportView(props: {
                 <div className="text-sm font-semibold">
                   Report Version: {report.schemaVersion}
                 </div>
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-slate-500">
                   {formatDateTime(report.createdAt)}
                 </div>
               </div>
@@ -423,7 +438,7 @@ export default function VarianceReportView(props: {
             <ReportBody report={report} />
           </div>
         ) : (
-          <div className="text-sm text-slate-400">No report found.</div>
+          <div className="text-sm text-slate-500">No report found.</div>
         )}
       </Card>
     </section>

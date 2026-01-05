@@ -30,7 +30,7 @@ export default function LoginPage() {
         <Card className="space-y-4">
           <div className="space-y-5">
             <h1 className="text-2xl font-semibold">Sign in</h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-500">
               Use your Auth0 account to access Spec Agent.
             </p>
           </div>
@@ -40,7 +40,7 @@ export default function LoginPage() {
           ) : null}
 
           {isLoading ? (
-            <div className="text-sm text-slate-400">Loading…</div>
+            <div className="text-sm text-slate-500">Loading…</div>
           ) : isAuthenticated ? (
             <div className="space-y-3">
               <div className="text-sm">

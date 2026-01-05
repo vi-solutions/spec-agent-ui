@@ -86,7 +86,7 @@ export default function ProjectComparisonsView(props: { projectId: string }) {
       <div className="flex items-baseline justify-between gap-3">
         <div className="flex gap-2">
           <div className="font-semibold">Comparisons</div>
-          <div className="text-slate-400">({comparisons.length})</div>
+          <div className="text-slate-500">({comparisons.length})</div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function ProjectComparisonsView(props: { projectId: string }) {
                   {c.model_name}
                   {c.prompt_version ? ` • ${c.prompt_version}` : ""}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-500">
                   {new Date(c.created_at).toLocaleString()} • {c.status}
                 </div>
                 {c.error ? (
@@ -146,7 +146,7 @@ export default function ProjectComparisonsView(props: { projectId: string }) {
         ))}
 
         {comparisons.length === 0 && status !== "loading" ? (
-          <div className="text-sm text-slate-400">No comparisons yet.</div>
+          <div className="text-sm text-slate-500">No comparisons yet.</div>
         ) : null}
       </div>
     </Card>
