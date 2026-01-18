@@ -17,8 +17,8 @@ jobs:
         with:
           host: app.visolutions
           username: deploy
-          key: ${{ secrets.DROPLET_SSH_KEY }}
-          port: ${{ secrets.DROPLET_SSH_PORT || 22 }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_SSH_PORT || 22 }}
           script: |
             set -e
             /home/deploy/apps/spec-agent-ui/deploy.sh
