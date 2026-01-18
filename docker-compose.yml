@@ -5,13 +5,8 @@ services:
       dockerfile: Dockerfile
     container_name: spec-agent-ui
     restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_AUTH0_DOMAIN: ${NEXT_PUBLIC_AUTH0_DOMAIN}
-      NEXT_PUBLIC_AUTH0_CLIENT_ID: ${NEXT_PUBLIC_AUTH0_CLIENT_ID}
-      NEXT_PUBLIC_AUTH0_AUDIENCE: ${NEXT_PUBLIC_AUTH0_AUDIENCE}
-      NEXT_PUBLIC_AUTH0_REDIRECT_URI: ${NEXT_PUBLIC_AUTH0_REDIRECT_URI}
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+    env_file:
+      - .env
     networks:
       - web
 
@@ -23,9 +18,22 @@ services:
       - spec-agent-ui
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./deploy/certbot/www:/var/www/certbot
+      - ./deploy/certbot/conf:/etc/letsencrypt
+    networks:
+      - web
+
+  certbot:
+    image: certbot/certbot:v2.11.0
+    container_name: certbot
+    volumes:
+      - ./deploy/certbot/www:/var/www/certbot
+      - ./deploy/certbot/conf:/etc/letsencrypt
+    entrypoint: /bin/sh -c
+    command: "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
     networks:
       - web
 
